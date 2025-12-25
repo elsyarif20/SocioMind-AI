@@ -1,24 +1,25 @@
 
 import React, { useState } from 'react';
 import { generateCustomQuestion } from '../services/gemini';
-import { Language, CustomQuestion, QuestionType } from '../types';
+import { Language, CustomQuestion, QuestionType, Subject } from '../types';
 
 interface CreatorProps {
   lang: Language;
+  subject: Subject;
 }
 
 const UI_STRINGS = {
   en: {
-    title: "Sociology Question Lab",
+    title: "Question Lab",
     desc: "Generate high-quality academic questions for practice or exams using AI.",
     topicLabel: "Subject / Topic",
     typeLabel: "Question Format",
     generateBtn: "Synthesize Question",
     loading: "Synthesizing professional content...",
-    placeholder: "e.g., Deviant Behavior, Globalization, Social Stratification...",
+    placeholder: "e.g., Perilaku Menyimpang, Globalisasi, Stratifikasi Sosial...",
     types: {
-      pg: "Standard Multiple Choice (Single)",
-      pg_tka: "PG TKA (Multi-select / Complex)",
+      pg: "Multiple Choice (Single)",
+      pg_tka: "PG TKA (Multi-select)",
       uraian: "Conceptual Essay",
       uraian_tka: "Advanced Critical Essay"
     },
@@ -76,7 +77,7 @@ const UI_STRINGS = {
   }
 };
 
-const Creator: React.FC<CreatorProps> = ({ lang }) => {
+const Creator: React.FC<CreatorProps> = ({ lang, subject }) => {
   const [topic, setTopic] = useState('');
   const [type, setType] = useState<QuestionType>('pg_tka');
   const [loading, setLoading] = useState(false);
@@ -92,7 +93,8 @@ const Creator: React.FC<CreatorProps> = ({ lang }) => {
     setLoading(true);
     setQuestion(null);
     try {
-      const result = await generateCustomQuestion(type, topic, lang);
+      // Fix: Added missing subject argument
+      const result = await generateCustomQuestion(type, topic, lang, subject);
       setQuestion(result);
     } catch (e) { console.error(e); }
     finally { setLoading(false); }

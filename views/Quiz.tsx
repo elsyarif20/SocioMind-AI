@@ -1,10 +1,11 @@
 
 import React, { useState, useEffect } from 'react';
 import { generateQuiz } from '../services/gemini';
-import { QuizQuestion, Language } from '../types';
+import { QuizQuestion, Language, Subject } from '../types';
 
 interface QuizProps {
   lang: Language;
+  subject: Subject;
 }
 
 const UI_STRINGS = {
@@ -79,7 +80,7 @@ const UI_STRINGS = {
   }
 };
 
-const Quiz: React.FC<QuizProps> = ({ lang }) => {
+const Quiz: React.FC<QuizProps> = ({ lang, subject }) => {
   const [questions, setQuestions] = useState<QuizQuestion[]>([]);
   const [currentIdx, setCurrentIdx] = useState(0);
   const [loading, setLoading] = useState(false);
@@ -115,7 +116,8 @@ const Quiz: React.FC<QuizProps> = ({ lang }) => {
     setLevelChangeMsg(null);
     const currentLevel = masteryLevels[topic] || 1;
     try {
-      const q = await generateQuiz(topic, lang, currentLevel);
+      // Fix: Corrected generateQuiz call with missing subject argument
+      const q = await generateQuiz(topic, lang, subject, currentLevel);
       setQuestions(q);
     } catch (e) { console.error(e); }
     finally { setLoading(false); }

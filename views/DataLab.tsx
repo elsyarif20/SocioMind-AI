@@ -1,19 +1,20 @@
 
 import React, { useState } from 'react';
 import { analyzeSocialData } from '../services/gemini';
-import { Language } from '../types';
+import { Language, Subject } from '../types';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Cell } from 'recharts';
 
 interface DataLabProps {
   lang: Language;
+  subject: Subject;
 }
 
 const UI_STRINGS = {
   en: {
-    title: "Social Data Laboratory",
-    desc: "Write your social observations and let AI perform theoretical quantitative analysis.",
+    title: "Data Laboratory",
+    desc: "Write your observations and let AI perform theoretical quantitative analysis.",
     placeholder: "Example: I observed young people in a cafe interacting more with their phones than friends...",
-    loading: "SocioMind is processing theoretical perspectives...",
+    loading: "Processing theoretical perspectives...",
     analyzeBtn: "Analyze Observation",
     analyzing: "Analyzing...",
     visualTitle: "Theory Visualization",
@@ -24,10 +25,10 @@ const UI_STRINGS = {
     charCount: "characters"
   },
   id: {
-    title: "Laboratorium Data Sosial",
-    desc: "Tuliskan observasi sosial Anda dan biarkan AI melakukan analisis kuantitatif berbasis teori.",
+    title: "Laboratorium Data",
+    desc: "Tuliskan observasi Anda dan biarkan AI melakukan analisis kuantitatif berbasis teori.",
     placeholder: "Contoh: Saya mengamati anak muda di kafe lebih banyak berinteraksi dengan layar HP daripada teman...",
-    loading: "SocioMind sedang memproses perspektif teoritis...",
+    loading: "Sedang memproses perspektif teoritis...",
     analyzeBtn: "Analisis Observasi",
     analyzing: "Sedang Menganalisis...",
     visualTitle: "Visualisasi Teori",
@@ -38,10 +39,10 @@ const UI_STRINGS = {
     charCount: "karakter"
   },
   ar: {
-    title: "مختبر البيانات الاجتماعية",
-    desc: "اكتب ملاحظاتك الاجتماعية ودع الذكاء الاصطناعي يقوم بإجراء تحليل كمي نظري.",
+    title: "مختبر البيانات",
+    desc: "اكتب ملاحظاتك ودع الذكاء الاصطناعي يقوم بإجراء تحليل كمي نظري.",
     placeholder: "مثال: لاحظت شباباً في مقهى يتفاعلون مع هواتفهم أكثر من أصدقائهم...",
-    loading: "SocioMind يقوم بمعالجة المنظورات النظرية...",
+    loading: "جاري معالجة المنظورات النظرية...",
     analyzeBtn: "تحليل الملاحظة",
     analyzing: "جاري التحليل...",
     visualTitle: "تصوير النظرية",
@@ -53,7 +54,7 @@ const UI_STRINGS = {
   }
 };
 
-const DataLab: React.FC<DataLabProps> = ({ lang }) => {
+const DataLab: React.FC<DataLabProps> = ({ lang, subject }) => {
   const [input, setInput] = useState('');
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState<any>(null);
@@ -66,7 +67,8 @@ const DataLab: React.FC<DataLabProps> = ({ lang }) => {
     if (!input.trim()) return;
     setLoading(true);
     try {
-      const data = await analyzeSocialData(input, lang);
+      // Fix: Added missing subject argument
+      const data = await analyzeSocialData(input, lang, subject);
       setResult(data);
     } catch (e) {
       console.error(e);

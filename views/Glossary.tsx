@@ -1,10 +1,11 @@
 
 import React, { useState, useMemo } from 'react';
 import { getDefinition } from '../services/gemini';
-import { Language, GlossaryTerm } from '../types';
+import { Language, GlossaryTerm, Subject } from '../types';
 
 interface GlossaryProps {
   lang: Language;
+  subject: Subject;
 }
 
 const STATIC_TERMS: GlossaryTerm[] = [
@@ -14,7 +15,7 @@ const STATIC_TERMS: GlossaryTerm[] = [
   { term: 'Disintegrasi', category: 'phenomenon', definition: { id: 'Proses pudarnya norma-norma dan nilai-nilai dalam masyarakat karena adanya perubahan.', en: 'The process of fading norms and values in society due to changes.', ar: 'عملية تلاشي المعايير والقيم في المجتمع بسبب التغيرات.' } },
   { term: 'Fakta Sosial', category: 'theory', definition: { id: 'Cara bertindak, berpikir, dan merasa yang berada di luar individu dan memiliki kekuatan memaksa (Emile Durkheim).', en: 'Ways of acting, thinking, and feeling that exist outside the individual and have coercive power (Emile Durkheim).', ar: 'طرق التصرف والتفكير والشعور التي توجد خارج الفرد ولها قوة قسرية (إميل دوركايم).' } },
   { term: 'Fungsionalisme', category: 'theory', definition: { id: 'Teori yang melihat masyarakat sebagai sistem yang terdiri dari bagian-bagian yang saling bergantung dan bekerja sama untuk mencapai stabilitas.', en: 'A theory that sees society as a system consisting of interdependent parts that work together to achieve stability.', ar: 'نظرية ترى المجتمع كالنظام يتكون من أجزاء مترابطة تعمل معاً لتحقيق الاستقرار.' } },
-  { term: 'Interaksi Sosial', category: 'phenomenon', definition: { id: 'Hubungan timbal balik berupa aksi dan reaksi antar individu, individu dengan kelompok, atau antar kelompok.', en: 'Reciprocal relationships in the form of action and reaction between individuals, individuals and groups, or between groups.', ar: 'علاقات متبادلة في شكل فعل ورد فعل بين الأفراد، أو الأفراد والجماعات، أو بين الجماعات.' } },
+  { term: 'Interaksi Sosial', category: 'phenomenon', definition: { id: 'Hubungan timbal balik berupa aksi dan reaksi antar individu, individu dengan kelompok, atau antar kelompok.', en: 'Reciprocal relationships in the form of action and reaction between individuals, individuals and groups, or between groups.', ar: 'علاقات متبادلة في شكل فعل ورد فعل بين الأفراد، أو الأفراد والجماعات، atau بين الجماعات.' } },
   { term: 'Konflik Sosial', category: 'phenomenon', definition: { id: 'Pertentangan antar anggota masyarakat yang bersifat menyeluruh dalam kehidupan.', en: 'Comprehensive opposition between members of society in life.', ar: 'معارضة شاملة بين أفراد المجتمع في الحياة.' } },
   { term: 'Mobilitas Sosial', category: 'structure', definition: { id: 'Perpindahan status sosial individu atau kelompok dari satu lapisan ke lapisan lain.', en: 'The movement of individual or group social status from one layer to another.', ar: 'انتقال الوضع الاجتماعي للفرد أو الجماعة من طبقة إلى أخرى.' } },
   { term: 'Masyarakat Multikultural', category: 'structure', definition: { id: 'Masyarakat yang terdiri atas beragam kelompok budaya yang hidup bersama dengan pengakuan kesederajatan.', en: 'A society consisting of diverse cultural groups living together with recognition of equality.', ar: 'مجتمع يتكون من مجموعات ثقافية متنوعة تعيش معاً مع الاعتراف بالمساواة.' } },
@@ -24,9 +25,9 @@ const STATIC_TERMS: GlossaryTerm[] = [
 
 const UI_STRINGS = {
   en: {
-    title: "Sociological Glossary",
-    desc: "A standardized dictionary of essential sociological terms and theoretical definitions.",
-    searchPlaceholder: "Search for a term (e.g., Anomie, Hegemony)...",
+    title: "Glossary",
+    desc: "A standardized dictionary of essential terms and theoretical definitions.",
+    searchPlaceholder: "Search for a term...",
     categoryLabel: "Filter by Category",
     all: "All Terms",
     theory: "Theory",
@@ -34,15 +35,15 @@ const UI_STRINGS = {
     phenomenon: "Phenomena",
     structure: "Structure",
     noResults: "Term not found in our database.",
-    askAi: "Ask SocioMind AI for a definition",
+    askAi: "Ask AI for a definition",
     aiLoading: "Synthesizing definition...",
     aiTitle: "AI Academic Insight",
     reset: "Clear Search"
   },
   id: {
-    title: "Glosarium Sosiologi",
-    desc: "Kamus standar istilah-istilah sosiologi esensial dan definisi teoritis.",
-    searchPlaceholder: "Cari istilah (misal: Anomi, Hegemoni)...",
+    title: "Glosarium",
+    desc: "Kamus standar istilah-istilah esensial dan definisi teoritis.",
+    searchPlaceholder: "Cari istilah...",
     categoryLabel: "Filter Kategori",
     all: "Semua Istilah",
     theory: "Teori",
@@ -50,15 +51,15 @@ const UI_STRINGS = {
     phenomenon: "Fenomena",
     structure: "Struktur",
     noResults: "Istilah tidak ditemukan di database kami.",
-    askAi: "Tanya SocioMind AI untuk definisi",
+    askAi: "Tanya AI untuk definisi",
     aiLoading: "Menyusun definisi akademik...",
     aiTitle: "Wawasan Akademik AI",
     reset: "Bersihkan Pencarian"
   },
   ar: {
-    title: "قاموس علم الاجتماع",
-    desc: "قاموس معتمد للمصطلحات الاجتماعية الأساسية والتعاريف النظرية.",
-    searchPlaceholder: "ابحث عن مصطلح (مثل: الأنوميا، الهيمنة)...",
+    title: "قاموس المصطلحات",
+    desc: "قاموس معتمد للمصطلحات الأساسية والتعاريف النظرية.",
+    searchPlaceholder: "ابحث عن مصطلح...",
     categoryLabel: "تصفية حسب الفئة",
     all: "جميع المصطلحات",
     theory: "نظرية",
@@ -66,14 +67,14 @@ const UI_STRINGS = {
     phenomenon: "ظواهر",
     structure: "بنية",
     noResults: "لم يتم العثور على المصطلح في قاعدة بياناتنا.",
-    askAi: "اطلب تعريفاً من SocioMind AI",
+    askAi: "اطلب تعريفاً من الذكاء الاصطناعي",
     aiLoading: "جاري صياغة التعريف...",
     aiTitle: "رؤية أكاديمية من الذكاء الاصطناعي",
     reset: "مسح البحث"
   }
 };
 
-const Glossary: React.FC<GlossaryProps> = ({ lang }) => {
+const Glossary: React.FC<GlossaryProps> = ({ lang, subject }) => {
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
   const [aiDefinition, setAiDefinition] = useState<string | null>(null);
@@ -90,14 +91,13 @@ const Glossary: React.FC<GlossaryProps> = ({ lang }) => {
     }).sort((a, b) => a.term.localeCompare(b.term));
   }, [searchTerm, selectedCategory]);
 
-  const alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ".split("");
-
   const handleAiSearch = async () => {
     if (!searchTerm) return;
     setAiLoading(true);
     setAiDefinition(null);
     try {
-      const def = await getDefinition(searchTerm, lang);
+      // Fix: Passed missing subject argument to getDefinition
+      const def = await getDefinition(searchTerm, lang, subject);
       setAiDefinition(def || null);
     } catch (e) {
       console.error(e);

@@ -1,10 +1,11 @@
 
 import React, { useState } from 'react';
 import { generateCaseStudy } from '../services/gemini';
-import { CaseStudy, Language } from '../types';
+import { CaseStudy, Language, Subject } from '../types';
 
 interface CaseStudiesProps {
   lang: Language;
+  subject: Subject;
 }
 
 interface CaseCategory {
@@ -76,46 +77,46 @@ const CASE_DIRECTORY: CaseCategory[] = [
 const UI_STRINGS = {
   en: {
     title: "Case Analysis Lab",
-    desc: "Examine 100 real-world sociological cases and generate academic solutions.",
-    loading: "Consulting sociological archives...",
+    desc: "Examine real-world cases and generate academic solutions.",
+    loading: "Consulting archives...",
     topicLabel: "Case Subject",
     scenarioLabel: "Analytical Scenario",
     discussionLabel: "Inquiry Questions",
     solutionsLabel: "Proposed Academic Solutions",
     resetBtn: "Select Different Case",
-    footerNote: "Analysis and interventions synthesized by SocioMind AI.",
+    footerNote: "Analysis and interventions synthesized by AI.",
     selectCategory: "Select Category",
     selectTopic: "Choose a Case Study"
   },
   id: {
     title: "Lab Analisis Kasus",
-    desc: "Pelajari 100 studi kasus sosiologi dunia nyata dan susun solusi akademiknya.",
-    loading: "Mengkonsultasikan arsip sosiologis...",
+    desc: "Pelajari studi kasus dunia nyata dan susun solusi akademiknya.",
+    loading: "Mengkonsultasikan arsip...",
     topicLabel: "Subjek Kasus",
     scenarioLabel: "Skenario Analitis",
     discussionLabel: "Pertanyaan Diskusi",
     solutionsLabel: "Solusi Akademik yang Diusulkan",
     resetBtn: "Pilih Kasus Lain",
-    footerNote: "Analisis dan intervensi disusun secara otomatis oleh SocioMind AI.",
+    footerNote: "Analisis dan intervensi disusun secara otomatis oleh AI.",
     selectCategory: "Pilih Kategori",
     selectTopic: "Pilih Studi Kasus"
   },
   ar: {
     title: "مختبر تحليل الحالات",
-    desc: "افحص 100 حالة اجتماعية واقعية واستخلص الحلول الأكاديمية.",
-    loading: "البحث في الأرشيف الاجتماعي...",
+    desc: "افحص حالات واقعية واستخلص الحلول الأكاديمية.",
+    loading: "البحث في الأرشيف...",
     topicLabel: "موضوع الحالة",
     scenarioLabel: "سيناريو التحليل",
     discussionLabel: "أسئلة المناقشة",
     solutionsLabel: "الحلول الأكاديمية المقترحة",
     resetBtn: "اخter حالة أخرى",
-    footerNote: "تم تجميع التحليل والحلول بواسطة SocioMind AI.",
+    footerNote: "تم تجميع التحليل والحلول بواسطة الذكاء الاصطناعي.",
     selectCategory: "اختر فئة",
     selectTopic: "اختر دراسة حالة"
   }
 };
 
-const CaseStudies: React.FC<CaseStudiesProps> = ({ lang }) => {
+const CaseStudies: React.FC<CaseStudiesProps> = ({ lang, subject }) => {
   const [loading, setLoading] = useState(false);
   const [caseStudy, setCaseStudy] = useState<CaseStudy & { proposedSolutions?: string[] } | null>(null);
   const [topic, setTopic] = useState('');
@@ -128,7 +129,8 @@ const CaseStudies: React.FC<CaseStudiesProps> = ({ lang }) => {
     setLoading(true);
     setTopic(selectedTopic);
     try {
-      const data = await generateCaseStudy(selectedTopic, lang);
+      // Fix: Added missing subject argument
+      const data = await generateCaseStudy(selectedTopic, lang, subject);
       setCaseStudy(data);
     } catch (e) {
       console.error(e);
@@ -257,7 +259,7 @@ const CaseStudies: React.FC<CaseStudiesProps> = ({ lang }) => {
 
               <footer className={`pt-8 border-t border-slate-100 flex justify-between items-center text-slate-400 text-xs italic ${isRtl ? 'flex-row-reverse' : ''}`}>
                  <span>{t.footerNote}</span>
-                 <span className="font-bold opacity-50">SocioMind // Academic Intelligence</span>
+                 <span className="font-bold opacity-50">Academic Intelligence</span>
               </footer>
             </div>
           </article>

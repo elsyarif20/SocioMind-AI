@@ -1,5 +1,6 @@
 
 export type Language = 'en' | 'id' | 'ar';
+export type Subject = 'sociology' | 'history' | 'economics' | 'biology';
 
 export interface Concept {
   id: string;
@@ -12,19 +13,19 @@ export interface Concept {
 export interface QuizQuestion {
   question: string;
   options: string[];
-  correctAnswers: number[]; // Berubah menjadi array untuk mendukung multi-jawaban
+  correctAnswers: number[];
   explanation: string;
-  isMultiSelect?: boolean; // Flag untuk UI
+  isMultiSelect?: boolean;
 }
 
 export type QuestionType = 'pg' | 'pg_tka' | 'uraian' | 'uraian_tka';
 
 export interface CustomQuestion {
   type: QuestionType;
-  content: string; // Narasi/Pertanyaan
-  options?: string[]; // Untuk PG
-  answerKeys?: string[] | number[]; // Berubah menjadi plural untuk mendukung multi-jawaban
-  deepExplanation: string; // Analisis sosiologis mendalam
+  content: string;
+  options?: string[];
+  answerKeys?: string[] | number[];
+  deepExplanation: string;
 }
 
 export interface CaseStudy {
@@ -34,16 +35,10 @@ export interface CaseStudy {
   proposedSolutions?: string[];
 }
 
-export interface AnalysisResult {
-  category: string;
-  value: number;
-  label: string;
-}
-
 export interface GlossaryTerm {
   term: string;
-  definition: Record<Language, string>;
   category: 'theory' | 'method' | 'phenomenon' | 'structure';
+  definition: Record<Language, string>;
 }
 
 export enum View {

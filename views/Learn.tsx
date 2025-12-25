@@ -1,7 +1,7 @@
 
 import React, { useState } from 'react';
 import { explainConcept } from '../services/gemini';
-import { Language } from '../types';
+import { Language, Subject } from '../types';
 import ReactMarkdown from 'react-markdown';
 
 interface SubTopic {
@@ -17,6 +17,7 @@ interface Category {
 
 interface LearnProps {
   lang: Language;
+  subject: Subject;
 }
 
 const CURRICULUM: Category[] = [
@@ -89,7 +90,7 @@ const CURRICULUM: Category[] = [
 const UI_STRINGS = {
   en: {
     title: "Academy Library",
-    desc: "A refined repository of sociological knowledge following Kurikulum Merdeka and Classical Perspectives.",
+    desc: "A refined repository of knowledge following Kurikulum Merdeka and Classical Perspectives.",
     loading: "Synthesizing academic material...",
     placeholder: "Deepen your inquiry: Theorists, comparative analysis, or modern application...",
     btnAsk: "Annotate",
@@ -103,8 +104,8 @@ const UI_STRINGS = {
     backToToc: "Return to Archives"
   },
   id: {
-    title: "Akademi Sosiologi",
-    desc: "Eksplorasi materi akademik sosiologi Kurikulum Merdeka & Perspektif Islam dengan AI.",
+    title: "Akademi AI",
+    desc: "Eksplorasi materi akademik Kurikulum Merdeka & Perspektif Islam dengan AI.",
     loading: "Menyusun materi akademik...",
     placeholder: "Perdalam pertanyaan Anda: Teori, analisis komparatif, atau studi kasus...",
     btnAsk: "Anotasi",
@@ -119,7 +120,7 @@ const UI_STRINGS = {
   },
   ar: {
     title: "مكتبة الأكاديمية",
-    desc: "مستودع شامل للمعرفة الاجتماعية، يتبع المنهج المستقل والآفاق الكلاسيكية.",
+    desc: "مستودع شامل للمعرفة، يتبع المنهج المستقل والآفاق الكلاسيكية.",
     loading: "تجميع المادة الأكاديمية...",
     placeholder: "تعمق في استفسارك: نظريات، تحليل مقارن...",
     btnAsk: "تعليق",
@@ -157,7 +158,7 @@ const InteractiveLi = ({ children }: { children: React.ReactNode }) => {
   return <li className="bg-slate-50 border border-slate-100 p-4 rounded-xl mb-2">{children}</li>;
 };
 
-const Learn: React.FC<LearnProps> = ({ lang }) => {
+const Learn: React.FC<LearnProps> = ({ lang, subject }) => {
   const [selectedTopic, setSelectedTopic] = useState<SubTopic | null>(null);
   const [explanation, setExplanation] = useState<string>('');
   const [loading, setLoading] = useState(false);
@@ -171,7 +172,8 @@ const Learn: React.FC<LearnProps> = ({ lang }) => {
     setLoading(true);
     setExplanation('');
     try {
-      const text = await explainConcept(topic.title.id, lang);
+      // Fix: Added missing subject argument
+      const text = await explainConcept(topic.title.id, lang, subject);
       setExplanation(text || t.error);
     } catch (e) {
       setExplanation(t.error);
@@ -185,7 +187,8 @@ const Learn: React.FC<LearnProps> = ({ lang }) => {
     if (!selectedTopic || !query) return;
     setLoading(true);
     try {
-      const text = await explainConcept(selectedTopic.title.id, lang, query);
+      // Fix: Added missing subject argument
+      const text = await explainConcept(selectedTopic.title.id, lang, subject, query);
       setExplanation(text || t.error);
       setQuery('');
     } catch (e) {
@@ -200,7 +203,7 @@ const Learn: React.FC<LearnProps> = ({ lang }) => {
       <header className={`space-y-4 max-w-4xl mx-auto ${isRtl ? 'text-right' : 'text-center'}`}>
         <div className="flex items-center justify-center gap-3 text-indigo-600 font-black text-xs uppercase tracking-widest">
            <span className="w-8 h-[2px] bg-indigo-600"></span>
-           SocioMind Academy
+           Academy AI
            <span className="w-8 h-[2px] bg-indigo-600"></span>
         </div>
         <h2 className="text-5xl font-black text-slate-900 tracking-tighter">{t.title}</h2>
@@ -287,10 +290,10 @@ const Learn: React.FC<LearnProps> = ({ lang }) => {
                   </div>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
                      <div className="p-6 bg-slate-50 rounded-2xl border border-slate-100 italic text-xs text-slate-400 leading-relaxed">
-                       [1] Konten disintesis berdasarkan prinsip Kurikulum Merdeka dan merujuk pada pemikiran Ibnu Khaldun (Kitab Al-Muqaddimah) sebagai fondasi sosiologi klasik.
+                       [1] Konten disintesis berdasarkan prinsip Kurikulum Merdeka sebagai fondasi akademik.
                      </div>
                      <div className="p-6 bg-slate-50 rounded-2xl border border-slate-100 italic text-xs text-slate-400 leading-relaxed">
-                       [2] Referensi teori mencakup Asabiyyah, Umran, serta perbandingan sosiologi Timur dan Barat.
+                       [2] Referensi teori mencakup kurikulum nasional serta perspektif global yang relevan.
                      </div>
                   </div>
                </div>
@@ -303,7 +306,7 @@ const Learn: React.FC<LearnProps> = ({ lang }) => {
               <div className="space-y-4">
                 <div className="flex items-center gap-2">
                    <span className="text-indigo-400 text-2xl">✨</span>
-                   <label className="text-[10px] font-black uppercase tracking-[0.2em] text-indigo-300">Akademik AI Deep-Dive</label>
+                   <label className="text-[10px] font-black uppercase tracking-[0.2em] text-indigo-300">Academic AI Deep-Dive</label>
                 </div>
                 <textarea
                   value={query}
